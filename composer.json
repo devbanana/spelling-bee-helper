@@ -1,0 +1,20 @@
+{
+    "name": "devbanana/spelling-bee-helper",
+    "description": "Helps in solving the NYTimes Spelling Bee.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Devbanana\\SpellingBeeHelper\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Brandon Olivares",
+            "email": "programmer2188@gmail.com"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "symfony/console": "^6.3"
+    }
+}
