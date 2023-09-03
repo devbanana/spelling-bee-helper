@@ -20,6 +20,10 @@ final class PuzzleDownloader
      */
     public function download(\DateTimeInterface $date): array
     {
+        if ($this->exists($date)) {
+            return self::getWords(self::getPuzzlePath($date));
+        }
+
         $url = sprintf('https://nytbee.com/Bee_%s.html', $date->format('Ymd'));
 
         $html = file_get_contents($url);
@@ -61,8 +65,31 @@ final class PuzzleDownloader
         return file_exists(self::getPuzzlePath($date));
     }
 
+    public function getWordListExcept(\DateTimeInterface $date)
+    {
+        $files = glob(self::PUZZLES_DIR . '/*.txt');
+        $words = [];
+
+        foreach ($files as $file) {
+            if (pathinfo($file, PATHINFO_FILENAME) === $date->format('Y-m-d')) {
+                continue;
+            }
+
+            $words = array_merge($words, self::getWords($file));
+        }
+
+        sort($words);
+
+        return array_unique($words);
+    }
+
     private static function getPuzzlePath(\DateTimeInterface $date): string
     {
         return sprintf('%s/%s.txt', self::PUZZLES_DIR, $date->format('Y-m-d'));
+    }
+
+    private static function getWords(string $path): array|false
+    {
+        return file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     }
 }

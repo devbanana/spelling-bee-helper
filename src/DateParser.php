@@ -25,4 +25,9 @@ final class DateParser
             return null;
         }
     }
+
+    public static function getToday(): \DateTime
+    {
+        return new \DateTime('today', new \DateTimeZone('UTC'));
+    }
 }
