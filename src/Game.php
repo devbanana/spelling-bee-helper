@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Devbanana\SpellingBeeHelper;
 
+use Devbanana\SpellingBeeHelper\Exception\WordAlreadyPlayedException;
+
 final class Game
 {
     private const GAMEs_DIR = 'var/data/games';
@@ -84,6 +86,17 @@ final class Game
         }
 
         return $date;
+    }
+
+    public static function loadActiveGame()
+    {
+        $activeGame = self::getActiveGame();
+
+        if ($activeGame === null) {
+            throw new \RuntimeException('There are currently no active games.');
+        }
+
+        return new self($activeGame);
     }
 
     public function start(): void
@@ -225,6 +238,25 @@ final class Game
         return $pangrams;
     }
 
+    public function guess(string $word): bool
+    {
+        $word = strtolower(trim($word));
+
+        if (\in_array($word, $this->wordsFound, true)) {
+            throw new WordAlreadyPlayedException();
+        }
+
+        if (!\in_array($word, $this->words, true)) {
+            return false;
+        }
+
+        $this->wordsFound[] = $word;
+
+        $this->saveState();
+
+        return true;
+    }
+
     private function getGamePath(\DateTimeInterface $date): string
     {
         return sprintf('%s/game_%s.txt', self::GAMEs_DIR, $date->format('Y-m-d'));
@@ -276,5 +308,13 @@ final class Game
         $uniqueLetters = array_unique(str_split($word));
 
         return \count($uniqueLetters) === 7;
+    }
+
+    private function saveState(): void
+    {
+        $lines = [implode('', $this->getLetters())];
+        $lines = array_merge($lines, $this->wordsFound);
+
+        file_put_contents($this->getGamePath($this->date), implode("\n", $lines) . "\n");
     }
 }
