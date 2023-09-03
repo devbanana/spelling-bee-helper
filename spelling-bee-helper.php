@@ -3,8 +3,11 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+use Devbanana\SpellingBeeHelper\Command\DownloadCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application('Spelling Bee Helper');
+
+$application->add(new DownloadCommand());
 
 $application->run();
