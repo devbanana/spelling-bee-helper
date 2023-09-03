@@ -13,8 +13,20 @@
             "email": "programmer2188@gmail.com"
         }
     ],
-    "minimum-stability": "beta",
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/devbanana/php-cs-fixer-config"
+        }
+    ],
     "require": {
         "symfony/console": "^6.3"
+    },
+    "require-dev": {
+        "devbanana/php-cs-fixer-config": "dev-master"
+    },
+    "config": {
+        "sort-packages": true
     }
 }
