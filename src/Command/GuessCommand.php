@@ -33,7 +33,7 @@ final class GuessCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (Game::getActiveGame() === null) {
-            $io->error('No game is currently active. Please start a game first.');
+            $io->error(self::NO_ACTIVE_GAME_ERROR);
 
             return Command::INVALID;
         }
