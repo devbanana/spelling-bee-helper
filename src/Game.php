@@ -111,6 +111,22 @@ final class Game
         );
     }
 
+    public function finish(): void
+    {
+        unlink(self::GAMEs_DIR . '/active-game.txt');
+    }
+
+    public function abort(): void
+    {
+        $this->finish();
+        unlink($this->getGamePath($this->date));
+    }
+
+    public function getDate(): \DateTimeInterface
+    {
+        return $this->date;
+    }
+
     /**
      * @return string[] The list of acceptable letters in this puzzle
      */
