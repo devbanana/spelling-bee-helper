@@ -59,8 +59,8 @@ final class Game
         $this->words = $downloader->download($date);
         $this->historicalWords = $downloader->getWordListExcept($date);
 
-        if (file_exists($this->getGamePath($date))) {
-            $lines = file($this->getGamePath($date), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (file_exists($this->getGamePath())) {
+            $lines = file($this->getGamePath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             $this->letters = str_split(array_shift($lines));
             $this->wordsFound = $lines;
         } else {
@@ -119,7 +119,7 @@ final class Game
     public function abort(): void
     {
         $this->finish();
-        unlink($this->getGamePath($this->date));
+        unlink($this->getGamePath());
     }
 
     public function getDate(): \DateTimeInterface
@@ -296,9 +296,9 @@ final class Game
         return null;
     }
 
-    private function getGamePath(\DateTimeInterface $date): string
+    private function getGamePath(): string
     {
-        return sprintf('%s/game_%s.txt', self::GAMEs_DIR, $date->format('Y-m-d'));
+        return sprintf('%s/game_%s.txt', self::GAMEs_DIR, $this->date->format('Y-m-d'));
     }
 
     /**
@@ -347,6 +347,6 @@ final class Game
         $lines = [implode('', $this->getLetters())];
         $lines = array_merge($lines, $this->wordsFound);
 
-        file_put_contents($this->getGamePath($this->date), implode("\n", $lines) . "\n");
+        file_put_contents($this->getGamePath(), implode("\n", $lines) . "\n");
     }
 }
