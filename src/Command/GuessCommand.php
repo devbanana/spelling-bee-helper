@@ -44,7 +44,11 @@ final class GuessCommand extends Command
 
         try {
             if ($game->guess($word)) {
-                $io->success('That word was found in the puzzle.');
+                if ($game->isPangram($word)) {
+                    $io->success('Pangram!');
+                } else {
+                    $io->success('That word was found in the puzzle.');
+                }
             } else {
                 $io->error('That word was not found in the puzzle.');
             }

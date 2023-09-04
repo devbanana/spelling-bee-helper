@@ -238,6 +238,13 @@ final class Game
         return $pangrams;
     }
 
+    public function isPangram(string $word): bool
+    {
+        $uniqueLetters = array_unique(str_split($word));
+
+        return \count($uniqueLetters) === 7;
+    }
+
     public function guess(string $word): bool
     {
         $word = strtolower(trim($word));
@@ -301,13 +308,6 @@ final class Game
         }
 
         return $points;
-    }
-
-    private function isPangram(string $word): bool
-    {
-        $uniqueLetters = array_unique(str_split($word));
-
-        return \count($uniqueLetters) === 7;
     }
 
     private function saveState(): void
