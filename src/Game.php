@@ -68,7 +68,7 @@ final class Game
                 mkdir(self::GAMEs_DIR, 0o755, true);
             }
 
-            file_put_contents($this->getGamePath($date), implode('', $this->getLetters()) . "\n");
+            $this->saveState();
         }
     }
 
