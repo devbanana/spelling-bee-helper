@@ -20,7 +20,7 @@ final class Game
     /**
      * @var string[]
      */
-    private array $pastHints;
+    private array $historicalWords;
 
     /**
      * @var string[]
@@ -57,7 +57,7 @@ final class Game
 
         $downloader = new PuzzleDownloader();
         $this->words = $downloader->download($date);
-        $this->pastHints = $downloader->getWordListExcept($date);
+        $this->historicalWords = $downloader->getWordListExcept($date);
 
         if (file_exists($this->getGamePath($date))) {
             $lines = file($this->getGamePath($date), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -262,6 +262,22 @@ final class Game
         $this->saveState();
 
         return true;
+    }
+
+    public function getHistoricalWord(): ?string
+    {
+        $historicalWords = $this->historicalWords;
+        shuffle($historicalWords);
+
+        foreach ($historicalWords as $word) {
+            if (\in_array($word, $this->words, true) && !\in_array($word, $this->wordsFound, true)) {
+                $this->guess($word);
+
+                return $word;
+            }
+        }
+
+        return null;
     }
 
     private function getGamePath(\DateTimeInterface $date): string
