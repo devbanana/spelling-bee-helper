@@ -3,7 +3,9 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+use Devbanana\SpellingBeeHelper\Command\AbortCommand;
 use Devbanana\SpellingBeeHelper\Command\DownloadCommand;
+use Devbanana\SpellingBeeHelper\Command\FinishCommand;
 use Devbanana\SpellingBeeHelper\Command\GuessCommand;
 use Devbanana\SpellingBeeHelper\Command\HistoricalWordCommand;
 use Devbanana\SpellingBeeHelper\Command\LettersCommand;
@@ -17,5 +19,7 @@ $application->add(new StartCommand());
 $application->add(new GuessCommand());
 $application->add(new LettersCommand());
 $application->add(new HistoricalWordCommand());
+$application->add(new AbortCommand());
+$application->add(new FinishCommand());
 
 $application->run();
