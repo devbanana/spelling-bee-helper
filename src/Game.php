@@ -88,7 +88,7 @@ final class Game
         return $date;
     }
 
-    public static function loadActiveGame()
+    public static function loadActiveGame(): self
     {
         $activeGame = self::getActiveGame();
 
