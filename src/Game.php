@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Devbanana\SpellingBeeHelper;
 
+use Devbanana\SpellingBeeHelper\Exception\NoHistoricalWordsMatchFilters;
+use Devbanana\SpellingBeeHelper\Exception\NoMoreHistoricalWordsException;
 use Devbanana\SpellingBeeHelper\Exception\WordAlreadyPlayedException;
 
 final class Game
@@ -280,20 +282,40 @@ final class Game
         return true;
     }
 
-    public function getHistoricalWord(): ?string
+    /**
+     * @param callable[] $filters An array of filters that accept the word being filtered, and return a bool
+     */
+    public function getHistoricalWord(array $filters = []): string
     {
-        $historicalWords = $this->historicalWords;
-        shuffle($historicalWords);
+        $matchedWords = [];
 
-        foreach ($historicalWords as $word) {
-            if (\in_array($word, $this->words, true) && !\in_array($word, $this->wordsFound, true)) {
-                $this->guess($word);
-
-                return $word;
+        foreach ($this->historicalWords as $word) {
+            if (!\in_array($word, $this->words, true) || \in_array($word, $this->wordsFound, true)) {
+                continue;
             }
+
+            $matchedWords[] = $word;
         }
 
-        return null;
+        if (empty($matchedWords)) {
+            throw new NoMoreHistoricalWordsException();
+        }
+
+        shuffle($matchedWords);
+
+        foreach ($matchedWords as $word) {
+            foreach ($filters as $filter) {
+                if ($filter($word) === false) {
+                    continue 2;
+                }
+            }
+
+            $this->guess($word);
+
+            return $word;
+        }
+
+        throw new NoHistoricalWordsMatchFilters();
     }
 
     private function getGamePath(): string
