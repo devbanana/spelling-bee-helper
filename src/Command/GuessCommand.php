@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -24,7 +25,8 @@ final class GuessCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('word', InputArgument::REQUIRED, 'The word to guess.')
+            ->addArgument('word', InputArgument::OPTIONAL, 'The word to guess.')
+            ->addOption('interactive', 'i', InputOption::VALUE_NONE, 'Guess in interactive mode')
         ;
     }
 
@@ -39,26 +41,49 @@ final class GuessCommand extends Command
         }
 
         $game = Game::loadActiveGame();
+        $interactive = $input->getOption('interactive');
 
-        $word = (string) $input->getArgument('word');
+        if ($interactive === false) {
+            $word = $input->getArgument('word');
 
-        try {
-            if ($game->guess($word)) {
-                if ($game->isPangram($word)) {
-                    $io->success('Pangram!');
-                } else {
-                    $io->success('That word was found in the puzzle.');
-                }
-            } else {
-                $io->error('That word was not found in the puzzle.');
+            if ($word === null) {
+                $io->error('Please provide a word to guess.');
+
+                return Command::INVALID;
             }
-        } catch (WordAlreadyPlayedException) {
-            $io->error('That word was already played');
-
-            return Command::INVALID;
         }
 
-        self::showStatus($game, $io);
+        while (true) {
+            if ($interactive === true) {
+                $word = $io->ask('Enter a word to guess (or press Enter to exit)');
+
+                if ($word === null) {
+                    break;
+                }
+            }
+
+            try {
+                if ($game->guess($word)) {
+                    $io->success($game->isPangram($word) ? 'Pangram!' : 'That word was found in the puzzle.');
+                } else {
+                    $io->error('That word was not found in the puzzle.');
+                }
+            } catch (WordAlreadyPlayedException) {
+                $io->error('That word was already played');
+
+                if ($interactive === true) {
+                    continue;
+                }
+
+                return Command::INVALID;
+            }
+
+            self::showStatus($game, $io);
+
+            if ($interactive === false) {
+                break;
+            }
+        }
 
         return Command::SUCCESS;
     }
